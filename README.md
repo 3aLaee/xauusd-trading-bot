@@ -1,44 +1,95 @@
-XAU/USD Trading Bot
-This is an automated trading bot for the XAU/USD (Gold to US Dollar) currency pair using the MetaTrader 5 (MT5) platform. The bot implements a MACD-based trading strategy combined with price action for generating buy and sell signals.
+# XAU/USD Trading Bot
 
-VERY IMPORTANT NOTES
-This code is for testing purposes only, always use trading bots in a demo accounts first. The current setup has predefined risk management rules (SL: 10 pips). Adjust parameters like Stop Loss and Take Profit to suit your proper risk mananagement strategy.
+This is an automated bot designed to trade the **Gold (XAU) to US Dollar (USD)** currency pair on the MetaTrader 5 (MT5) platform. It uses a **MACD-based trading strategy** combined with **price action** to generate buy and sell signals.
 
-Features
-MACD Strategy: The bot uses the MACD (Moving Average Convergence Divergence) indicator to identify potential buy and sell signals.
-Support and Resistance Levels: The bot dynamically calculates support and resistance levels using the last 10 bars.
-Risk Management: Set Stop Loss (15 pips) and Take Profit (10 pips).
-Real-Time Trading: It executes trades in real-time using the MetaTrader 5 API.
-Trading Strategy
-Buy Signal: A buy signal is triggered when:
+---
 
-The MACD line crosses above the signal line, indicating a bullish trend.
-The price crosses above the last resistance level.
-Sell Signal: A sell signal is triggered when:
+## ⚠️ VERY IMPORTANT NOTES
 
-The MACD line crosses below the signal line, indicating a bearish trend.
-The price crosses below the last resistance level.
-Stop Loss and Take Profit:
+> This bot is for educational and testing purposes only. Always **use trading bots on a demo account** first.  
+> The current setup includes predefined risk management rules (e.g., **Stop Loss: 15 pips**). Adjust these parameters to match your personal risk management strategy.
 
-Stop Loss is set at 15 pips.
-Take Profit is set at 10 pips.
-Installation
-1. Clone the Repository
-git clone github.com/3aLaee/xauusd-trading-bot
+---
 
-2. Install Dependencies
+## 🌟 Features
+
+- **MACD Strategy:**  
+  The bot uses the **MACD (Moving Average Convergence Divergence)** indicator to identify buy and sell signals based on market momentum.
+
+- **Support and Resistance Levels:**  
+  Dynamic calculation of **support** and **resistance levels** using the last 10 bars to optimize trade entry/exit points.
+
+- **Risk Management:**  
+  Predefined **Stop Loss** (15 pips) and **Take Profit** (10 pips) for automated risk management.
+
+- **Real-Time Trading:**  
+  Executes trades in real-time using the **MetaTrader 5 API**.
+
+---
+
+## 📈 Trading Strategy
+
+### Buy Signal Criteria:
+- **MACD Line Crossover:** When the MACD line crosses above the signal line, indicating a bullish trend.
+- **Price Action:** When the price crosses above the last **resistance level**, signaling an entry point.
+
+### Sell Signal Criteria:
+- **MACD Line Crossover:** When the MACD line crosses below the signal line, indicating a bearish trend.
+- **Price Action:** When the price crosses below the last **resistance level**, signaling an exit point.
+
+### Risk Management:
+- **Stop Loss:** Set at **15 pips**.
+- **Take Profit:** Set at **10 pips**.
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Repository
+
+First, clone this repository to your local machine:
+git clone https://github.com/3aLaee/xauusd-trading-bot.git
+
+### 2. Install Dependencies
+
 pip install -r requirements.txt
 
-3. Create a .env File
-Create a .env file to store sensitive data such as your credentials and trading parameters. Example .env:
+### 3. Set Up the `.env` File
 
-ACCOUNT=your_account_number PASSWORD=your_password SERVER=your_server_name PIP_SIZE=0.10 STOP_LOSS_PIPS=15 TAKE_PROFIT_PIPS=10 LOT_SIZE=0.1
+Create a `.env` file to store data such as your MetaTrader 5 credentials and trading parameters. Here's an example of what the `.env` file should look like:
+  > ACCOUNT=your_account_number
+  > PASSWORD=your_password
+  > SERVER=your_server_name
+  > PIP_SIZE=0.10
+  > STOP_LOSS_PIPS=15
+  > TAKE_PROFIT_PIPS=10
+  > LOT_SIZE=0.1
 
-Contributing
-If you wish to contribute to this project, feel free to fork the repository, make changes, and create a pull request. Please follow the guidelines mentioned below:
+## 🛠 Contributing
 
-Fork the repository. Create a feature branch (git checkout -b feature-name). Make your changes and test them. Commit your changes (git commit -m "Description of the changes"). Push to the branch (git push origin feature-name). Create a pull request.
+I welcome contributions! To contribute to this project, follow these steps:
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details
+1. **Fork the repository** and clone it to your local machine.
+2. **Create a new branch** for your feature:
+   git checkout -b feature-name
+3. Make your changes to the code.
+4. Commit your changes with a descriptive message:
+  git commit -m "Description of the changes"
+5- Push to your fork:
+  git push origin feature-name
+6. Create a pull request to merge your changes into the main branch.
+
+We ask that you ensure your code is clean, well-documented, and thoroughly tested before submitting a pull request.
+
+## 📝 License
+This project is licensed under the MIT License. For more details, please check the LICENSE file.
+
+
+
+
+
+
+
+
+
 
