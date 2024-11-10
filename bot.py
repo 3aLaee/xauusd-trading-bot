@@ -8,19 +8,17 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-# Retrieve sensitive data from environment variables
 account = os.getenv("MT5_ACCOUNT")
 password = os.getenv("MT5_PASSWORD")
 server = os.getenv("MT5_SERVER")
 symbol = os.getenv("SYMBOL")
 
-# Trading parameters from environment variables
 pip_size = float(os.getenv("PIP_SIZE", 0.10))  
 stop_loss_pips = float(os.getenv("STOP_LOSS_PIPS", 15)) * pip_size
 take_profit_pips = float(os.getenv("TAKE_PROFIT_PIPS", 10)) * pip_size
 lot_size = float(os.getenv("LOT_SIZE", 0.1))
 
-# Connect to MetaTrader 5
+# Connect to MT5
 mt5.initialize()
 mt5.login(account, password=password, server=server)
 
