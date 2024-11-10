@@ -82,7 +82,8 @@ I welcome contributions! To contribute to this project, follow these steps:
 We ask that you ensure your code is clean, well-documented, and thoroughly tested before submitting a pull request.
 
 ## 📝 License
-This project is licensed under the MIT License. For more details, please check the LICENSE file.
+This project is licensed under the ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+. For more details, please check the LICENSE file.
 
 
 
