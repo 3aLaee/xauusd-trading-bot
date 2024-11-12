@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 # Retrieve sensitive data from environment variables
-account = os.getenv("MT5_ACCOUNT")
+account = int(os.getenv("MT5_ACCOUNT", "0"))  # Ensures account is int
 password = os.getenv("MT5_PASSWORD")
 server = os.getenv("MT5_SERVER")
 symbol = os.getenv("SYMBOL")
@@ -21,11 +21,20 @@ take_profit_pips = float(os.getenv("TAKE_PROFIT_PIPS", 10)) * pip_size
 lot_size = float(os.getenv("LOT_SIZE", 0.1))
 
 # Connect to MetaTrader 5
-mt5.initialize()
-mt5.login(account, password=password, server=server)
+if not mt5.initialize():
+    print("Failed to initialize MetaTrader 5.")
+    quit()
+
+if not mt5.login(account, password=password, server=server):
+    print(f"Failed to log in to MetaTrader 5. Error: {mt5.last_error()}")
+    mt5.shutdown()
+    quit()
 
 def get_data():
     rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_M1, 0, 50)  # 50 1-min candles
+    if rates is None:
+        print(f"Error retrieving data for {symbol}")
+        return None
     data = pd.DataFrame(rates)
     data['time'] = pd.to_datetime(data['time'], unit='s')
     return data
@@ -55,7 +64,7 @@ def is_market_open(symbol):
     if market_info is None:
         print("Error retrieving market info.")
         return False
-    return market_info.trade_sessions > 0
+    return market_info.trade_mode == mt5.SYMBOL_TRADE_MODE_FULL
 
 # Check if a buy or sell signal is triggered
 def check_trade_conditions(data, resistance_level, support_level):
@@ -65,6 +74,20 @@ def check_trade_conditions(data, resistance_level, support_level):
     elif latest['macd_cross'] and latest['hist'] > 0 and latest['close'] > resistance_level:
         return "buy"
     return None
+
+#Check open positions
+def show_open_positions():
+    positions = mt5.positions_get()
+    if positions is None:
+        print("No open positions or failed to retrieve positions.")
+        return
+    if len(positions) > 0:
+        print("Open positions:")
+        for pos in positions:
+            print(f"Symbol: {pos.symbol}, Type: {'Buy' if pos.type == 0 else 'Sell'}, Volume: {pos.volume}, Price: {pos.price_open}")
+    else:
+        print("No open positions.")
+
 
 # Execute trades
 def place_order(direction, price):
@@ -92,12 +115,20 @@ def place_order(direction, price):
 
 # Run the trading bot in a loop
 while True:
-    if not is_market_open(symbol):
-        print("Market is closed. Waiting for the market to open...")
+    print("Checking market status...")
+    if is_market_open(symbol):
+        print(f"Market for {symbol} is open.")
+    else:
+        print(f"Market for {symbol} is not open. Exiting.")
+        mt5.shutdown()
+        quit()
+
+
+    data = get_data()
+    if data is None or data.empty:
         sleep(60)
         continue
 
-    data = get_data()
     data = calculate_macd(data)
     resistance_level, support_level = find_support_resistance(data)
     trade_signal = check_trade_conditions(data, resistance_level, support_level)
@@ -105,5 +136,7 @@ while True:
     if trade_signal:
         latest_price = mt5.symbol_info_tick(symbol).ask if trade_signal == "buy" else mt5.symbol_info_tick(symbol).bid
         place_order(trade_signal, latest_price)
+    
+    show_open_positions()
 
     sleep(60)  # Wait for the next minute candle
