@@ -62,7 +62,7 @@ Create a `.env` file to store data such as your MetaTrader 5 credentials and tra
   > ACCOUNT=your_account_number
   > PASSWORD=your_password
   > SERVER=your_server_name
-  > PIP_SIZE=0.10
+  > PIP_SIZE=0.01
   > STOP_LOSS_PIPS=15
   > TAKE_PROFIT_PIPS=10
   > LOT_SIZE=0.1
