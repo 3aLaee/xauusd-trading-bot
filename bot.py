@@ -76,6 +76,7 @@ def find_support_resistance(data):
     support_level = recent_lows.min()
     return resistance_level, support_level
 
+
 # Check for trading signals
 def check_trade_conditions(data, resistance_level, support_level):
     latest = data.iloc[-1]
@@ -85,29 +86,63 @@ def check_trade_conditions(data, resistance_level, support_level):
         return "buy"
     return None
 
-# Place an order
+# Function to calculate indicators for testing
+def calculate_indicators(data):
+    """
+    Calculates and returns key indicators such as MACD, support, and resistance.
+    Returns:
+        dict: A dictionary with MACD, support, and resistance values.
+    """
+    data_with_macd = calculate_macd(data)
+    resistance_level, support_level = find_support_resistance(data_with_macd)
+    return {
+        "macd": data_with_macd[['macd', 'signal', 'hist']].tail(1).to_dict('records')[0],
+        "support": support_level,
+        "resistance": resistance_level
+    }
+
+
+# Place an order without SL and TP, then update with SL and TP
 def place_order(direction, price):
-    sl = price - stop_loss_pips if direction == "sell" else price + stop_loss_pips
-    tp = price + take_profit_pips if direction == "sell" else price - take_profit_pips
+    # Place order without SL and TP
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,
         "volume": lot_size,
         "type": mt5.ORDER_TYPE_SELL if direction == "sell" else mt5.ORDER_TYPE_BUY,
         "price": price,
-        "sl": sl,
-        "tp": tp,
-        "deviation": 10,
+        "deviation": 20,
         "magic": 123456,
         "comment": "Auto-trading bot",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
     result = mt5.order_send(request)
+
     if result.retcode != mt5.TRADE_RETCODE_DONE:
-        logging.error(f"Order failed: {result.retcode}")
+        logging.error(f"Order failed: {result.retcode} - {result.comment}")
     else:
         logging.info(f"{direction.capitalize()} order placed at {price}")
+
+        # Retrieve position ID to set SL and TP
+        position_id = result.order
+        sl = price - stop_loss_pips if direction == "sell" else price + stop_loss_pips
+        tp = price + take_profit_pips if direction == "sell" else price - take_profit_pips
+
+        # Modify the order to set SL and TP
+        modify_request = {
+            "action": mt5.TRADE_ACTION_SLTP,
+            "symbol": symbol,
+            "position": position_id,
+            "sl": sl,
+            "tp": tp,
+        }
+        modify_result = mt5.order_send(modify_request)
+
+        if modify_result.retcode == mt5.TRADE_RETCODE_DONE:
+            logging.info(f"SL and TP set for {direction} order with Position ID {position_id}")
+        else:
+            logging.error(f"Failed to set SL/TP: {modify_result.retcode} - {modify_result.comment}")
 
 # Display open positions
 def show_open_positions():
@@ -139,7 +174,13 @@ def run_trading_bot():
         if trade_signal:
             latest_price = mt5.symbol_info_tick(symbol).ask if trade_signal == "buy" else mt5.symbol_info_tick(symbol).bid
             place_order(trade_signal, latest_price)
+        
+       
         show_open_positions()
+        
+        
+
+
         sleep(60)  # Wait for the next minute candle
 
 # Initialize MT5 and start the trading bot
