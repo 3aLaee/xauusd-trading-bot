@@ -18,7 +18,7 @@ This is an automated bot designed to trade the **Gold (XAU) to US Dollar (USD)**
 - **MACD Strategy:**  
   The bot uses the **MACD (Moving Average Convergence Divergence)** indicator to identify buy and sell signals based on market momentum.
 
-- **Support and Resistance Levels:**  
+- **Price Action:**  
   Dynamic calculation of **support** and **resistance levels** using the last 10 bars to optimize trade entry/exit points.
 
 - **Risk Management:**  
@@ -31,13 +31,11 @@ This is an automated bot designed to trade the **Gold (XAU) to US Dollar (USD)**
 
 ## 📈 Trading Strategy
 
-### Buy Signal Criteria:
-- **MACD Line Crossover:** When the MACD line crosses above the signal line, indicating a bullish trend.
-- **Price Action:** When the price crosses above the last **resistance level**, signaling an entry point.
+### Buy Signal Setup:
+- **MACD Line Crossover:** When the MACD line crosses above the signal line then the price crosses above the last **resistance level** in the 1 min time frame.
 
-### Sell Signal Criteria:
-- **MACD Line Crossover:** When the MACD line crosses below the signal line, indicating a bearish trend.
-- **Price Action:** When the price crosses below the last **resistance level**, signaling an exit point.
+### Sell Signal Setup:
+-When the MACD line crosses below the signal line then the price crosses below the last **support level** in the 1 min time frame.
 
 ### Risk Management:
 - **Stop Loss:** Set at **15 pips**.

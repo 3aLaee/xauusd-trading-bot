@@ -17,7 +17,7 @@ account = int(os.getenv("MT5_ACCOUNT", "0"))
 password = os.getenv("MT5_PASSWORD")
 server = os.getenv("MT5_SERVER")
 symbol = os.getenv("SYMBOL")
-pip_size = float(os.getenv("PIP_SIZE", 0.10))
+pip_size = float(os.getenv("PIP_SIZE", 0.01))
 stop_loss_pips = float(os.getenv("STOP_LOSS_PIPS", 15)) * pip_size
 take_profit_pips = float(os.getenv("TAKE_PROFIT_PIPS", 10)) * pip_size
 lot_size = float(os.getenv("LOT_SIZE", 0.1))
@@ -102,47 +102,41 @@ def calculate_indicators(data):
     }
 
 
-# Place an order without SL and TP, then update with SL and TP
+# Place an order with MetaTrader 5
 def place_order(direction, price):
-    # Place order without SL and TP
+    # Determine order type and SL/TP prices based on direction
+    if direction == "sell":
+        order_type = mt5.ORDER_TYPE_SELL
+        sl = price + stop_loss_pips  # Stop Loss above sell price
+        tp = price - take_profit_pips  # Take Profit below sell price
+    else:  # buy
+        order_type = mt5.ORDER_TYPE_BUY
+        sl = price - stop_loss_pips  # Stop Loss below buy price
+        tp = price + take_profit_pips  # Take Profit above buy price
+
+    # Place order with SL and TP
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,
         "volume": lot_size,
-        "type": mt5.ORDER_TYPE_SELL if direction == "sell" else mt5.ORDER_TYPE_BUY,
+        "type": order_type,
         "price": price,
+        "sl": sl,  # Stop Loss price
+        "tp": tp,  # Take Profit price
         "deviation": 20,
         "magic": 123456,
         "comment": "Auto-trading bot",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
+    
     result = mt5.order_send(request)
 
     if result.retcode != mt5.TRADE_RETCODE_DONE:
         logging.error(f"Order failed: {result.retcode} - {result.comment}")
     else:
-        logging.info(f"{direction.capitalize()} order placed at {price}")
+        logging.info(f"{direction.capitalize()} order placed at {price} with SL: {sl} and TP: {tp}")
 
-        # Retrieve position ID to set SL and TP
-        position_id = result.order
-        sl = price - stop_loss_pips if direction == "sell" else price + stop_loss_pips
-        tp = price + take_profit_pips if direction == "sell" else price - take_profit_pips
-
-        # Modify the order to set SL and TP
-        modify_request = {
-            "action": mt5.TRADE_ACTION_SLTP,
-            "symbol": symbol,
-            "position": position_id,
-            "sl": sl,
-            "tp": tp,
-        }
-        modify_result = mt5.order_send(modify_request)
-
-        if modify_result.retcode == mt5.TRADE_RETCODE_DONE:
-            logging.info(f"SL and TP set for {direction} order with Position ID {position_id}")
-        else:
-            logging.error(f"Failed to set SL/TP: {modify_result.retcode} - {modify_result.comment}")
 
 # Display open positions
 def show_open_positions():
@@ -153,7 +147,9 @@ def show_open_positions():
     if len(positions) > 0:
         logging.info("Open positions:")
         for pos in positions:
-            logging.info(f"Symbol: {pos.symbol}, Type: {'Buy' if pos.type == 0 else 'Sell'}, Volume: {pos.volume}, Price: {pos.price_open}")
+            logging.info(f"Symbol: {pos.symbol}, Type: {'Buy' if pos.type == 0 else 'Sell'}, "
+                         f"Volume: {pos.volume}, Open Price: {pos.price_open}, "
+                         f"SL: {pos.sl}, TP: {pos.tp}")
     else:
         logging.info("No open positions.")
 
