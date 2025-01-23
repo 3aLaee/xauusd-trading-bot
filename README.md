@@ -32,10 +32,10 @@ This is an automated bot designed to trade the **Gold (XAU) to US Dollar (USD)**
 ## 📈 Trading Strategy
 
 ### Buy Signal Setup:
-- **MACD Line Crossover:** When the MACD line crosses above the signal line then the price crosses above the last **resistance level** in the 1 min time frame.
+- When the MACD line crosses above the signal line **then** the price crosses above the last resistance level in the 1 min time frame.
 
 ### Sell Signal Setup:
--When the MACD line crosses below the signal line then the price crosses below the last **support level** in the 1 min time frame.
+- When the MACD line crosses below the signal line **then** the price crosses below the last support level in the 1 min time frame.
 
 ### Risk Management:
 - **Stop Loss:** Set at **15 pips**.
